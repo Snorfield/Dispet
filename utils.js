@@ -18,7 +18,7 @@ function simpleEmbed(content) {
 
 function emojiValidator(string) {
     const parsed = parseEmoji(string);
-    return (parsed.id) ? true : false;
+    return (parsed && parsed.id) ? true : false;
 }
 
 /**
@@ -43,3 +43,4 @@ function getRandomInt(max) {
 }
 
 module.exports = { parseEmojiInformation, emojiValidator, simpleEmbed, getRandomInt };
+
