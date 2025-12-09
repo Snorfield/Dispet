@@ -9,6 +9,8 @@ database.prepare(`
         health INTEGER,
         damage INTEGER,
         bio TEXT,
+        ability_name TEXT,
+        ability_bio TEXT,
         animated INTEGER
     )
 `).run();
@@ -23,5 +25,3 @@ database.prepare(`
         losses INTEGER DEFAULT 0
     )
 `).run();
-
-
