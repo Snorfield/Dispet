@@ -1,4 +1,4 @@
-const { createCanvas, loadImage, registerFont } = require('canvas');
+const { createCanvas, loadImage, registerFont } = require('@napi-rs/canvas');
 const path = require('path');
 
 registerFont(path.join(__dirname, '../../assets/Mirza-Regular.ttf'), { family: 'Mirza' });
