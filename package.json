@@ -2,7 +2,6 @@
   "dependencies": {
     "better-sqlite3": "^12.2.0",
     "discord.js": "^14.22.1",
-    "@napi-rs/canvas": "0.1.77"
+    "@napi-rs/canvas": "latest"
   }
 }
-
