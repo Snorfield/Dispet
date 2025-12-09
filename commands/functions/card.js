@@ -13,13 +13,12 @@ async function drawCard(emoji) {
     const width = canvas.width;
 
     const tiers = ['Common', 'Rare', 'Epic', 'Legendary', 'Mythical', 'Cosmic'];
-    const tierColors = ['#AAAAAA', '#0099FF', '#9933FF', '#f6e272ff', '#FF4500', '#470077'];
+    const tierColors = ['#AAAAAA', '#0099FF', '#9933FF', '#FFD001', '#FF4500', '#470077'];
 
     let gradient = context.createLinearGradient(200, 0, 400, 200);
-
-    gradient.addColorStop(0, tierColors[emoji.tier]);
+    gradient.addColorStop(0, tierColors[emoji.tier - 1]);
     gradient.addColorStop(0.5, '#ffffff');
-    gradient.addColorStop(1, tierColors[emoji.tier]);
+    gradient.addColorStop(1, tierColors[emoji.tier - 1]);
 
     const padding = 10;
 
@@ -85,17 +84,17 @@ async function drawCard(emoji) {
     const color = "#000000ff"
     const shadowColor = "#00000063";
 
-    let currentY = padding * 3.5 + imageDimensions;
+    let currentY = padding * 3.6 + imageDimensions;
 
     text(emoji.owner + "'s", currentY, "#00000080", shadowColor, 20);
-    currentY += 25;
+    currentY += 28;
 
     text(emoji.name, currentY, color, shadowColor, 35);
-    currentY += 30;
+    currentY += 26;
 
-    const tierColor = tierColors[emoji.tier];
-    text(tiers[emoji.tier], currentY, tierColor, tierColor, 25);
-    currentY += 31;
+    const tierColor = tierColors[emoji.tier - 1];
+    text(tiers[emoji.tier - 1], currentY, tierColor, tierColor, 25);
+    currentY += 30;
 
     text(`❤️ ${emoji.health}  ⚔️ ${emoji.damage}`, currentY, color, shadowColor, 23);
     currentY += 27;
