@@ -1,55 +1,58 @@
 const database = require('../database.js');
-const { simpleEmbed, emojiValidator, getEmojiInformation } = require('../utils.js')
-const generateEmojiInformation = require('../fetch.js')
+const { simpleEmbed, emojiValidator, parseEmojiInformation } = require('../utils.js')
+const generateEmojiInformation = require('./functions/experimental-fetch.js')
+const { getUserInformation, insertUserId, getEmojiInformation } = require('./functions/database-handlers.js')
 
 async function adopt(interaction) {
 
     await interaction.deferReply();
 
-    let selectUser = database.prepare('SELECT * FROM users WHERE user_id = ?');
     const commandUser = interaction.user;
-    let user = selectUser.get(commandUser.id);
+    let user = getUserInformation(commandUser.id);
 
+    // check if the user actually exists, and if not, add them
     if (!user) {
-        let insertUser = database.prepare(`INSERT OR IGNORE INTO users (user_id) VALUES (?)`);
-        insertUser.run(commandUser.id);
-        user = selectUser.get(commandUser.id);
+        insertUserId(commandUser.id);
+        user = getUserInformation(commandUser.id);
     }
 
     const emoji = interaction.options.getString('emoji');
 
+    // we can now do this since we grabbed the user data after inserting it
+
     if (user.emoji_id) {
+        return interaction.editReply({ embeds: [simpleEmbed('❌ You already have an adopted emoji, use `/release` to set it free before you can adopt another one.')] });
+    }
 
-        await interaction.editReply({ embeds: [simpleEmbed('❌ You already have an adopted emoji, use `/release` to set it free before you can adopt another one.')] });
-    } else {
+    // currently doesn't support unicode emojis so this also returns if it's a unicode emoji
 
-        if (!emojiValidator(emoji)) {
-            
-            await interaction.editReply({ embeds: [simpleEmbed('❌ Emoji is not valid. At this point only custom server emojis are supported.')] });
-        } else {
+    if (!emojiValidator(emoji)) {
+        return interaction.editReply({ embeds: [simpleEmbed('❌ Emoji is not valid. At this point only custom server emojis are supported.')] });
+    }
 
-            const emojiInformation = getEmojiInformation(emoji);
-            let isAdopted = database.prepare('SELECT * FROM users WHERE emoji_id = ?').get(emojiInformation.id);
 
-            if (isAdopted) {
-                 await interaction.editReply({ embeds: [simpleEmbed(`❌ User <@${isAdopted.user_id}> has already adopted this emoji.`)] });
-            } else {
+    const emojiInformation = parseEmojiInformation(emoji);
+    let isAdopted = database.prepare('SELECT * FROM users WHERE emoji_id = ?').get(emojiInformation.id);
 
-                let selectEmoji = database.prepare('SELECT * FROM cache WHERE emoji_id = ?');
-                let emojiExists = selectEmoji.get(emojiInformation.id);
+    // return early if another user already owns this emoji
+    if (isAdopted) {
+        return interaction.editReply({ embeds: [simpleEmbed(`❌ User <@${isAdopted.user_id}> has already adopted this emoji.`)] });
+    }
 
-                let updateUser = database.prepare(`
+    let emojiExists = getEmojiInformation(emojiInformation.id);
+
+    let updateUser = database.prepare(`
                     UPDATE users
                     SET pet_name = ?, emoji_id = ?
                     WHERE user_id = ?
                 `);
 
-                if (emojiExists) {
-                    updateUser.run(emojiInformation.name, emojiInformation.id, commandUser.id);
-                    await interaction.editReply({ embeds: [simpleEmbed('✅ You\'ve successfully adopted a ' + '`' + emojiInformation.name + '`.')] });
-                } else {
+    if (emojiExists) {
+        updateUser.run(emojiInformation.name, emojiInformation.id, commandUser.id);
+        return interaction.editReply({ embeds: [simpleEmbed('✅ You\'ve successfully adopted a ' + '`' + emojiInformation.name + '`.')] });
+    } else {
 
-                    let insertEmoji = database.prepare(`
+        let insertEmoji = database.prepare(`
                         INSERT OR IGNORE INTO cache (
                             emoji_id,
                             emoji_name,
@@ -57,29 +60,32 @@ async function adopt(interaction) {
                             health,
                             damage,
                             bio,
+                            ability_name,
+                            ability_bio,
                             animated
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                     `);
 
-                    const emojiObject = await generateEmojiInformation(emojiInformation.name);
+        const emojiObject = await generateEmojiInformation(emojiInformation.name);
 
-                    insertEmoji.run(
-                        emojiInformation.id,
-                        emojiInformation.name,
-                        Math.floor(Math.random() * 5) + 1,
-                        emojiObject.health,
-                        emojiObject.damage,
-                        emojiObject.bio,
-                        emojiInformation.animated ? 1 : 0
-                    );
+        insertEmoji.run(
+            emojiInformation.id,
+            emojiInformation.name,
+            // hmm should make this favored toward common tiers
+            Math.floor(Math.random() * 6) + 1,
+            emojiObject.health,
+            emojiObject.damage,
+            emojiObject.bio,
+            emojiObject.abilityName,
+            emojiObject.abilityBio,
+            emojiInformation.animated ? 1 : 0
+        );
 
-                    updateUser.run(emojiInformation.name, emojiInformation.id, commandUser.id);
+        updateUser.run(emojiInformation.name, emojiInformation.id, commandUser.id);
 
-                    await interaction.editReply({ embeds: [simpleEmbed('✅ You\'ve successfully adopted a ' + '`' + emojiInformation.name + '`.')] });
-                }
-            }
-        }
+        return interaction.editReply({ embeds: [simpleEmbed('✅ You\'ve successfully adopted a ' + '`' + emojiInformation.name + '`.')] });
     }
 }
 
 module.exports = adopt;
+
