@@ -27,9 +27,19 @@ function emojiValidator(string) {
  * @returns {object}
  */
 
-function getEmojiInformation(string) {
+function parseEmojiInformation(string) {
     const parsed = parseEmoji(string);
     return parsed;
 }
 
-module.exports = { getEmojiInformation, emojiValidator, simpleEmbed };
+/**
+ * 
+ * @param {*} max 
+ * @returns {integer}
+ */
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}
+
+module.exports = { parseEmojiInformation, emojiValidator, simpleEmbed, getRandomInt };
