@@ -109,7 +109,7 @@ async function drawCard(emoji) {
 
     drawTextMultipleLines(emoji.abilityBio, color, shadowColor, 20, 3);
 
-    const buffer = canvas.toBuffer('png');
+    const buffer = canvas.toBuffer('image/png');
 
     return buffer;
 }
