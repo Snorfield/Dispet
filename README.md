@@ -1,8 +1,6 @@
 # Dispet
 
-### Discord bot written in discord.js that allows you to adopt custom server emojis as pets
-
-WARNING: This project is heavily under-development, and things might be unstable. I put this together in 3~ hours as a fun project, it is unlikely to be maintained
+### Discord bot written in discord.js that allows you to adopt custom server emojis as pets, complete with custom collectible card generation
 
 ## To Use
 
