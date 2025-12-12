@@ -11,7 +11,7 @@ async function generateEmojiInformation(emojiName) {
     const prompt = `Given a custom emoji name, return only json with the following fields. 
                     Always use the given name when referring to it, never use your own.
                     Keep each field short, preferrably only two sentences or less.
-                    Emojis should not be themed as emojis, but rather as creatures objects, tools, etc.
+                    Emojis should not be themed as emojis, but rather as creatures, objects, tools, etc.
                     Don't make any assumptions about it beyond the name, and if you don't know what it is then avoid the topic.
                     If you really have no guesses as to what the emoji could represent, make a vague bio and generate a generic ability.
 
@@ -68,5 +68,6 @@ async function generateEmojiInformation(emojiName) {
 
 
 module.exports = generateEmojiInformation;
+
 
 
