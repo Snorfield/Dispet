@@ -4,7 +4,6 @@ const path = require('path');
 registerFont(path.join(__dirname, '../../assets/Mirza-Regular.ttf'), { family: 'Mirza' });
 
 async function drawCard(emoji) {
-
     // this is the average collectible card size from what I could find!
     const canvas = createCanvas(350, 490);
     const context = canvas.getContext("2d");
@@ -32,7 +31,7 @@ async function drawCard(emoji) {
     const image = await loadImage(`https://cdn.discordapp.com/emojis/${emoji.id}.${(emoji.animated) ? 'gif' : 'png'}`);
 
     const imageDimensions = 128;
-    context.drawImage(image, (width / 2) - (128 / 2), padding * 2, imageDimensions, imageDimensions);
+    context.drawImage(image, (width / 2) - (imageDimensions / 2), padding * 2, imageDimensions, imageDimensions);
 
     function text(text, y, color, shadowColor, size) {
         context.save();
@@ -45,12 +44,11 @@ async function drawCard(emoji) {
         context.shadowOffsetX = 0;
         context.shadowOffsetY = 0;
 
-        context.fillText(text, width / 2, y);
+        context.fillText(text, width / 2, y, width - padding * 2);
         context.restore();
     }
 
-    function drawTextMultipleLines(input, color, shadowColor, size, lines) {
-
+    function drawTextMultipleLines(input = "", color, shadowColor, size, lines) {
         const tokens = input.split(' ');
 
         const maxWidth = 320;

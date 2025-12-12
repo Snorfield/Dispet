@@ -14,7 +14,7 @@ async function release(interaction) {
         releaseUser.run(interaction.user.id);
         return interaction.editReply({ embeds: [simpleEmbed('✅ Your current emoji pet has been released to be on their own! Try using `/adopt` to get a new one.')] });
     } else {
-        return interaction.editReply({ embeds: [simpleEmbed('❌ You don\'t have an emoji pet to release! Try using `/adopt` to get one.')] });
+        return interaction.editReply({ embeds: [simpleEmbed("❌ You don't have an emoji pet to release! Try using `/adopt` to get one.")] });
     }
 }
 

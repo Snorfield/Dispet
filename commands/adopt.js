@@ -1,10 +1,17 @@
 const database = require('../database.js');
 const { simpleEmbed, emojiValidator, parseEmojiInformation } = require('../utils.js')
 const generateEmojiInformation = require('./functions/experimental-fetch.js')
-const { getUserInformation, insertUserId, getEmojiInformation } = require('./functions/database-handlers.js')
+const { getUserInformation, insertUserId, getEmojiInformation } = require('./functions/database-handlers.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
-async function adopt(interaction) {
+const viewButton = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+        .setCustomId('view_emoji')
+        .setLabel('View')
+        .setStyle(ButtonStyle.Primary)
+);
 
+async function adopt(interaction) { 
     await interaction.deferReply();
 
     const commandUser = interaction.user;
@@ -30,7 +37,6 @@ async function adopt(interaction) {
         return interaction.editReply({ embeds: [simpleEmbed('❌ Emoji is not valid. At this point only custom server emojis are supported.')] });
     }
 
-
     const emojiInformation = parseEmojiInformation(emoji);
     let isAdopted = database.prepare('SELECT * FROM users WHERE emoji_id = ?').get(emojiInformation.id);
 
@@ -49,9 +55,11 @@ async function adopt(interaction) {
 
     if (emojiExists) {
         updateUser.run(emojiInformation.name, emojiInformation.id, commandUser.id);
-        return interaction.editReply({ embeds: [simpleEmbed('✅ You\'ve successfully adopted a ' + '`' + emojiInformation.name + '`.')] });
+        return interaction.editReply({
+            embeds: [simpleEmbed('✅ You\'ve successfully adopted a ' + '`' + emojiInformation.name + '`.')],
+            components: [viewButton]
+        });
     } else {
-
         let insertEmoji = database.prepare(`
                         INSERT OR IGNORE INTO cache (
                             emoji_id,
@@ -68,11 +76,13 @@ async function adopt(interaction) {
 
         const emojiObject = await generateEmojiInformation(emojiInformation.name);
 
+        const weights = [1, 1, 1, 2, 2, 2, 3, 3, 4, 5, 6];
+        const tier = weights[Math.floor(Math.random() * weights.length)];
+
         insertEmoji.run(
             emojiInformation.id,
             emojiInformation.name,
-            // hmm should make this favored toward common tiers
-            Math.floor(Math.random() * 6) + 1,
+            tier,
             emojiObject.health,
             emojiObject.damage,
             emojiObject.bio,
@@ -83,7 +93,10 @@ async function adopt(interaction) {
 
         updateUser.run(emojiInformation.name, emojiInformation.id, commandUser.id);
 
-        return interaction.editReply({ embeds: [simpleEmbed('✅ You\'ve successfully adopted a ' + '`' + emojiInformation.name + '`.')] });
+        return interaction.editReply({
+            embeds: [simpleEmbed('✅ You\'ve successfully adopted a ' + '`' + emojiInformation.name + '`.')],
+            components: [viewButton]
+        });
     }
 }
 

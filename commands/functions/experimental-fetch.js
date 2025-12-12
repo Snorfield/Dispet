@@ -6,15 +6,15 @@ const { getRandomInt } = require('../../utils');
  * @returns {object}
  */
 
-async function generateEmojiInformation(emojiName) {
-
-    const prompt = `Given a custom emoji name, return only json with the following fields. 
-                    Always use the given name when referring to it, never use your own.
+async function generateEmojiInformation(emojiName, retry = true) {
+    const prompt = `Given a custom emoji name, return ONLY json with the following fields.
+                    Always use the given name when referring to it, NEVER use your own.
                     Keep each field short, preferrably only two sentences or less.
                     Emojis should not be themed as emojis, but rather as creatures, objects, tools, etc.
-                    Don't make any assumptions about it beyond the name, and if you don't know what it is then avoid the topic.
+                    DO NOT make any assumptions about it beyond the name, and if you don't know what it is then avoid the topic.
                     If you really have no guesses as to what the emoji could represent, make a vague bio and generate a generic ability.
 
+                    JSON structure:
                     {
                         bio: Short bio about it without being verbose, don't discuss what it resembles. But make the bio interesting to read,
                         abilityBio: Short description of an ability it has,
@@ -44,30 +44,30 @@ async function generateEmojiInformation(emojiName) {
     const fallback = abilities[getRandomInt(abilities.length)];
     try {
         const response = await fetch(`${url}system=${encodeURIComponent(JSON.stringify(prompt))}&prompt=${encodeURIComponent(emojiName)}&json=true`);
+    
         let text = await response.text();
         text = text.match(/\{[\s\S]*\}/)[0];
-        let json = JSON.parse(text);
+        
+        const json = JSON.parse(text);
 
         return {
-            bio: json.bio ?? `A ${emojiName}!`,
+            bio: json.bio ?? `${/^[aeiou]/i.test(emojiName) ? "An" : "A"} ${emojiName}!`,
             abilityName: json.abilityName ?? fallback.abilityName,
             abilityBio: json.abilityBio ?? fallback.abilityBio,
             health: getRandomInt(100) + 1,
             damage: getRandomInt(100)
         }
     } catch (error) {
-        return {
+        return retry === true ? await generateEmojiInformation(emojiName, false) : {
             bio: `A ${emojiName}!`,
             abilityName: fallback.abilityName,
             abilityBio: fallback.abilityBio,
             health: getRandomInt(100) + 1,
             damage: getRandomInt(100)
-        }
+        };
+
     }
 }
 
 
 module.exports = generateEmojiInformation;
-
-
-

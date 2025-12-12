@@ -4,18 +4,21 @@ const drawCard = require('./functions/card');
 const { AttachmentBuilder } = require('discord.js');
 
 async function view(interaction) {
+    let isUserAuthor = true;
+    let user = interaction.user;
 
-    await interaction.deferReply();
+    const ranFromButton = interaction.isButton();
+    if (!ranFromButton) {
+        isUserAuthor = true;
+        user = interaction.options.getUser('user');
+    }
 
-    let user = interaction.options.getUser('user');
-    let userId = null;
-
-    userId = (user) ? user.id : interaction.user.id;
-    user = (user) ? user : interaction.user;
+    const userId = user.id;
 
     let userObject = getUserInformation(userId);
-
     if (userObject && userObject.emoji_id) {
+        await interaction.deferReply();
+
         const emojiInformation = getEmojiInformation(userObject.emoji_id);
 
         const emoji = {
@@ -36,10 +39,13 @@ async function view(interaction) {
         const attachment = new AttachmentBuilder(image, { name: 'card.png' });
 
         return interaction.editReply({ files: [attachment] });
-
-    } else {
-        return interaction.editReply({ embeds: [simpleEmbed('❌ This user does not have an emoji pet.')] });
     }
+
+    return interaction.reply({
+        embeds: [simpleEmbed(
+            isUserAuthor ? "❌ You don't have an emoji pet! Try using `/adopt` to get one." : '❌ This user does not have an emoji pet.'
+        )]
+    });
 }
 
 module.exports = view;
