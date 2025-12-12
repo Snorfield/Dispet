@@ -12,6 +12,7 @@ async function generateEmojiInformation(emojiName) {
                     Always use the given name when referring to it, never use your own.
                     Keep each field short, preferrably only two sentences or less.
                     Emojis should not be themed as emojis, but rather as creatures, or objects, etc.
+                    Do not assume which creature it is, if it's not obvious via the name, don't discuss it.
 
                     {
                         bio: Short bio about it without being verbose, don't discuss what it resembles. But make the bio interesting to read,
@@ -66,3 +67,4 @@ async function generateEmojiInformation(emojiName) {
 
 
 module.exports = generateEmojiInformation;
+
