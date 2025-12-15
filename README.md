@@ -1,33 +1,40 @@
 # Dispet
 
-### Discord bot written in discord.js that allows you to adopt custom server emojis as pets, complete with custom collectible card generation
+### Discord bot written in discord.js that allows you to collect custom server emojis and battle (soon) with them, complete with collectible card generation
 
-## To Use
 
-Clone the repo
+## How To Host
+
+First, clone the repo or download it.
 
 ```bash
 git clone https://github.com/Snorfield/Dispet.git
 ```
-Install dependencies, requires Node.js to run
+Next install dependencies, requires Node.js to run. 
+
+**Note: This bot uses the [*canvas*](https://www.npmjs.com/package/canvas) module, which doesn't always work out of the box on certain systems. You can view the npm page for more information on how to install the additional dependencies if canvas isn't working for you.**
 
 ```bash
 npm i
 ```
-Fill out `config.example.json` and rename it to `config.json`.
 
-Register commands
+Fill out `config.example.json` with your credentials and rename it to `config.json`.
+
+Register the bot commands
 
 ```bash
-node register
+node register.js
 ```
-Initiate the database
+
+Initiate the database with therequired tables.
 
 ```bash
-node setup
+node setup.js
 ```
 Start the bot
 
 ```bash
-node index
+node index.js
 ```
+
+Congratulations, the bot is now (hopefully) online.
